@@ -3,39 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <title>Convertisseur TND -> EUR</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 50px; }
-    input { padding: 10px; font-size: 18px; width: 200px; }
-    h1, p { margin: 20px 0; }
-  </style>
 </head>
 <body>
   <h1>Convertisseur TND → EUR</h1>
-  <input type="number" id="amount" placeholder="Montant en TND">
-  <p id="resultat">Entrez un montant pour voir le résultat.</p>
+
+  <label for="amount">Montant en TND :</label>
+  <input type="number" id="amount" placeholder="Entrez le montant" />
+  <button onclick="convert()">Convertir</button>
+
+  <h2>Résultat :</h2>
+  <div id="result"></div>
 
   <script>
-    const input = document.getElementById('amount');
-    const result = document.getElementById('resultat');
+    function convert() {
+      const amount = document.getElementById('amount').value;
 
-    input.addEventListener('input', () => {
-      const montant = input.value;
-      if (!montant) {
-        result.textContent = "Entrez un montant pour voir le résultat.";
-        return;
-      }
-
-      fetch(`http://127.0.0.1:5000/convert?amount=${montant}`)
+      fetch(`http://127.0.0.1:5000/convert?amount=${amount}`)
         .then(response => response.json())
         .then(data => {
           if (data.error) {
-            result.textContent = `Erreur : ${data.error}`;
+            document.getElementById('result').innerText = "Erreur : " + data.error;
           } else {
-            result.textContent = `${data.amount_tnd} TND = ${data.amount_eur} EUR (Taux: ${data.exchange_rate})`;
+            document.getElementById('result').innerText =
+              `${data.amount_tnd} TND = ${data.amount_eur} EUR (Taux: ${data.exchange_rate})`;
           }
         })
-        .catch(() => result.textContent = "Erreur lors de la connexion à l'API.");
-    });
+        .catch(error => {
+          document.getElementById('result').innerText = "Erreur de connexion à l'API";
+          console.error(error);
+        });
+    }
   </script>
 </body>
 </html>
